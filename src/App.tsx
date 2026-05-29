@@ -132,6 +132,41 @@ function AppContent() {
               </div>
             )}
 
+            {/* Quick Login Assist Card */}
+            {!isSignUp && (
+              <div 
+                onClick={async () => {
+                  if (submitting) return;
+                  try {
+                    setSubmitting(true);
+                    setAuthError('');
+                    setEmail('photo');
+                    setPassword('photo');
+                    const { error } = await loginWithEmail('photo', 'photo');
+                    if (error) throw error;
+                  } catch (err: any) {
+                    setAuthError(err.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบแบบด่วน');
+                  } finally {
+                    setSubmitting(false);
+                  }
+                }}
+                className="mb-6 cursor-pointer group flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-xs text-primary-dark transition-all hover:bg-primary/10 active:scale-95"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition-transform group-hover:scale-110">
+                  <KeyRound size={16} />
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-900 flex items-center justify-between">
+                    <span>⚡ เข้าสู่ระบบแบบด่วน (Quick Login)</span>
+                    <span className="text-[10px] font-bold text-primary underline group-hover:text-primary-dark">คลิกเพื่อเข้าสู่ระบบ &rarr;</span>
+                  </p>
+                  <p className="mt-1 text-gray-500">
+                    เข้าใช้งานด่วนด้วย รหัส: <code className="rounded bg-white border border-gray-100 px-1 py-0.5 font-bold font-mono">photo</code> | รหัสผ่าน: <code className="rounded bg-white border border-gray-100 px-1 py-0.5 font-bold font-mono">photo</code>
+                  </p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleEmailAuth} className="space-y-4">
               {isSignUp && (
                 <div className="space-y-1.5">
@@ -153,14 +188,17 @@ function AppContent() {
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
                   <Mail size={12} />
-                  ที่อยู่อีเมล
+                  ชื่อผู้ใช้งาน หรือ อีเมล
                 </label>
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setAuthError('');
+                  }}
+                  placeholder="photo หรือ email@example.com"
                   className="w-full rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-sm outline-none ring-primary transition-all focus:bg-white focus:ring-2"
                 />
               </div>

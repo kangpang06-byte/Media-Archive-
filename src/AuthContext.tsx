@@ -33,6 +33,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single();
 
+      if (email === 'kangpang06@gmail.com' || email === 'photo@photo.local') {
+        setRole('admin');
+        return {
+          name: data?.name || 'ทีมโสตฯ (Photo)',
+          avatar_url: data?.avatar_url || '',
+        };
+      }
+
       if (data) {
         setRole(data.role as 'admin' | 'user');
         return {
@@ -41,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       } else {
         // Fallback role assignment if profile isn't queried yet
-        const defaultRole = email === 'kangpang06@gmail.com' ? 'admin' : 'user';
+        const defaultRole = (email === 'kangpang06@gmail.com' || email === 'photo@photo.local') ? 'admin' : 'user';
         setRole(defaultRole);
       }
     } catch (err) {
@@ -108,11 +116,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithEmail = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  const loginWithEmail = async (emailInput: string, passwordInput: string) => {
+    let finalEmail = emailInput;
+    let finalPassword = passwordInput;
+    let isPhotoAccount = false;
+
+    // Check if user is typing the simplified "photo" / "photo" credentials
+    const cleanEmail = emailInput.trim().toLowerCase();
+    if (cleanEmail === 'photo' && passwordInput === 'photo') {
+      finalEmail = 'photo@photo.local';
+      finalPassword = 'photophoto'; // At least 6 characters for Supabase
+      isPhotoAccount = true;
+    }
+
+    let { data, error } = await supabase.auth.signInWithPassword({
+      email: finalEmail,
+      password: finalPassword,
     });
+
+    if (error && isPhotoAccount) {
+      // If the photo account doesn't exist yet, automatically auto-register it
+      const signUpRes = await signUpWithEmail(finalEmail, finalPassword, 'ทีมโสตฯ (Photo)');
+      if (!signUpRes.error) {
+        // Retry sign-in now that it is registered
+        const retryRes = await supabase.auth.signInWithPassword({
+          email: finalEmail,
+          password: finalPassword,
+        });
+        return { error: retryRes.error };
+      }
+    }
+
     return { error };
   };
 
