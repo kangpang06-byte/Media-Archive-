@@ -3,7 +3,11 @@ import { AuthProvider, useAuth } from './AuthContext';
 import { Navbar } from './components/Navbar';
 import { MediaList } from './components/MediaList';
 import { AddMediaModal } from './components/AddMediaModal';
-import { Archive, Lock, Mail, User, ShieldAlert, KeyRound, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { 
+  Archive, Lock, Mail, User, ShieldAlert, KeyRound, ArrowRight, Eye, EyeOff, 
+  AlertTriangle, Server, Copy, Check, ExternalLink, Settings, Database 
+} from 'lucide-react';
+import { isSupabaseConfigured } from './supabase';
 
 function AppContent() {
   const { user, loading, login, loginWithEmail, signUpWithEmail } = useAuth();
@@ -18,6 +22,15 @@ function AppContent() {
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  
+  // Configuration helper states
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(label);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +73,136 @@ function AppContent() {
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <p className="text-sm font-medium text-gray-500 animate-pulse">กำลังเตรียมเข้าสู่ระบบ...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Guard view: Render a beautiful step-by-step setup guide if Supabase keys are missing (e.g. freshly deployed on Vercel)
+  if (!isSupabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-gradient-to-tr from-gray-50 via-white to-primary/5 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center font-sans">
+        <div className="max-w-xl w-full space-y-8 bg-white p-8 sm:p-10 rounded-[32px] shadow-xl border border-gray-100 relative overflow-hidden">
+          {/* Accent Glow */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+
+          {/* Heading */}
+          <div className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 border border-amber-100">
+              <AlertTriangle size={32} />
+            </div>
+            <h2 className="mt-6 text-2xl font-black text-gray-950 tracking-tight">
+              กรุณาเชื่อมต่อนโยบาย API บน Vercel
+            </h2>
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+              เว็บเซิร์ฟเวอร์ได้รับการอัปเดตเรียบร้อยแล้ว แต่เนื่องจากคุณเปิดใช้งานบน <span className="font-bold text-gray-900 border-b border-gray-200">Vercel</span> คุณจำเป็นต้องใส่รหัสเชื่อมโยงฐานข้อมูล (Environment Variables) เพื่อให้หน้าเว็บดึงข้อมูลผลงานได้
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-6">
+            <div className="rounded-2xl bg-slate-50 p-5 border border-gray-150 space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Database size={13} />
+                คีย์ที่จำเป็นต้องสแกนหรือระบุ
+              </h3>
+
+              {/* Variable 1 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-white border border-gray-100 shadow-sm">
+                <div>
+                  <p className="text-xs font-black font-mono text-gray-800">VITE_SUPABASE_URL</p>
+                  <p className="text-[11px] text-gray-500">ที่อยู่โฮสต์ฐานข้อมูลจำลอง Supabase</p>
+                </div>
+                <button
+                  onClick={() => handleCopy('VITE_SUPABASE_URL', 'url_key')}
+                  className="shrink-0 self-end sm:self-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
+                >
+                  {copiedKey === 'url_key' ? (
+                    <>
+                      <Check size={12} className="text-emerald-500" />
+                      <span className="text-emerald-600 font-bold">คัดลอกแล้ว!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} />
+                      <span>คัดลอกชื่อหัวข้อ</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Variable 2 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl bg-white border border-gray-100 shadow-sm">
+                <div>
+                  <p className="text-xs font-black font-mono text-gray-800">VITE_SUPABASE_ANON_KEY</p>
+                  <p className="text-[11px] text-gray-500">รหัสผ่านสำหรับเข้าถึงข้อมูลระดับเบื้องต้น</p>
+                </div>
+                <button
+                  onClick={() => handleCopy('VITE_SUPABASE_ANON_KEY', 'anon_key')}
+                  className="shrink-0 self-end sm:self-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
+                >
+                  {copiedKey === 'anon_key' ? (
+                    <>
+                      <Check size={12} className="text-emerald-500" />
+                      <span className="text-emerald-600 font-bold">คัดลอกแล้ว!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={12} />
+                      <span>คัดลอกชื่อหัวข้อ</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Step-by-Step Instructions */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-bold text-gray-900">🛠️ วิธีตั้งค่าบนหน้าแผงควบคุม Vercel:</h4>
+              
+              <ul className="space-y-3.5 text-xs text-gray-600 leading-relaxed list-none pl-0">
+                <li className="flex gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[10px]">1</span>
+                  <span>
+                    คัดลอกคีย์ <strong className="font-bold text-gray-950 font-mono">VITE_SUPABASE_URL</strong> และ <strong className="font-bold text-gray-950 font-mono">VITE_SUPABASE_ANON_KEY</strong> ไประบุใน Vercel
+                  </span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[10px]">2</span>
+                  <span>
+                    เปิดหน้าแผงควบคุม <strong>Vercel Dashboard</strong> &rarr; คลิกเลือกโปรเจกต์ของคุณ &rarr; ไปที่แท็บ <strong>Settings</strong> ด้านบน &rarr; เลือกเมนูซ้ายมือที่ชื่อว่า <strong>Environment Variables</strong>
+                  </span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[10px]">3</span>
+                  <span>
+                    วางคีย์ (Key) และนำค่าพารามิเตอร์ที่คุณได้รับจาก Supabase หรือที่ตั้งไว้ใน Secrets ของ AI Studio มาวางในช่อง Value แล้วกดปุ่ม <strong>Save/Add</strong>
+                  </span>
+                </li>
+                <li className="flex gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-[10px]">4</span>
+                  <span>
+                    ⚠️ <strong>สำคัญมาก:</strong> หลังจากเซฟค่าแล้ว ให้ไปที่แท็บ <strong>Deployments</strong> กดปุ่มจุดสามจุด <code className="px-1 py-0.5 rounded bg-gray-100 font-bold">...</code> ด้านหลังรายการสร้างล่าสุด แล้วคลิก <strong>Redeploy</strong> เพื่ออัปเดตรหัสขึ้นระบบ!
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-[11px] text-gray-400 font-medium">
+                * การคลิกคัดลอก จะช่วยป้อนรหัสฟิลด์ได้ถูกต้อง 100% ป้องกันการพิมพ์สะกดผิด
+              </p>
+              <a
+                href="https://vercel.com/dashboard"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4  py-2.5 rounded-xl text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 transition-all active:scale-95"
+              >
+                <span>ไปยังเว็บ Vercel Dashboard</span>
+                <ExternalLink size={12} />
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     );
