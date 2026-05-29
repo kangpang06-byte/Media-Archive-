@@ -23,49 +23,49 @@ interface MediaItem {
 const DEFAULT_MEDIA_ITEMS: MediaItem[] = [
   {
     id: '1',
-    title: 'วิดีโอประมวลภาพกิจกรรมปฐมนิเทศ คณะกรรมการนักเรียนปี 2568',
+    title: 'วิดีโอสาธิตการซ้อมแผนอพยพหนีไฟและรหัสภัยพิบัติฉุกเฉินระดับโรงพยาบาลปี 2569',
     type: 'video',
     url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80', // video thumbnail
     thumbnailUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=400&q=80',
-    description: 'วิดีโอบรรยากาศงานปฐมนิเทศประจำปี ความยาว 5 นาที บันทึกด้วยความคมชัดระดับ 4K เหมาะสำหรับนำไปฉายประชาสัมพันธ์โครงการ',
-    creator: 'ฝ่ายโสตทัศนูปกรณ์ คณะกรรมการนักเรียน',
-    tags: ['วิดีโอรวม', 'ปฐมนิเทศ', 'กิจกรรม2568', 'งานโสต'],
+    description: 'วิดีโอบันทึกการฝึกซ้อมแผนเผชิญเหตุฉุกเฉินและการเคลื่อนย้ายผู้ป่วยวิกฤต ความคมชัดระดับ 4K สำหรับทบทวนทักษะและอบรมบุคลากรทางการแพทย์',
+    creator: 'งานโสตทัศนศึกษาและประชาสัมพันธ์ ฝ่ายสื่อสารองค์กร',
+    tags: ['ซ้อมแผนฉุกเฉิน', 'อพยพหนีไฟ', 'ฝึกอบรมแพทย์', 'งานโสตฯ รพ.'],
     createdAt: '2026-05-15T09:00:00.000Z',
     clicksCount: 142
   },
   {
     id: '2',
-    title: 'ภาพถ่ายทางอากาศมุมสูง (Drone) อาคารเรียน 1 และหอประชุมใหญ่',
+    title: 'ภาพถ่ายทางอากาศมุมสูง (Drone) อาคารศูนย์การแพทย์เฉลิมพระเกียรติ และอาคารผู้ป่วยนอก (OPD)',
     type: 'photo',
     url: 'https://images.unsplash.com/photo-1508849789987-4e5333c12b78?auto=format&fit=crop&w=1200&q=80',
     thumbnailUrl: 'https://images.unsplash.com/photo-1508849789987-4e5333c12b78?auto=format&fit=crop&w=400&q=80',
-    description: 'ภาพมุมสูงความละเอียดสูง 48 ล้านพิกเซล ถ่ายในช่วงแสงเย็นเฉดสีทองสวยงาม สำหรับใช้เป็นภาพสไลด์แบนเนอร์หรือภาพหัวข้อนำเสนองานวิชาการ',
-    creator: 'ครูสมปอง โสตศึกษานิเทศ',
-    tags: ['ภาพถ่ายคอมพิวเตอร์', 'อาคารเรียน', 'มุมสูง', 'โดรน'],
+    description: 'ภาพถ่ายมุมสูงอาคารอำนวยการและอาคารบริการทางการแพทย์ ความละเอียดสูง 48 ล้านพิกเซล ถ่ายในช่วงแสงเย็นเพื่อใช้ทำหัวข้อนำเสนอผลงานวิจัยทางการแพทย์และแบนเนอร์เว็บไซต์',
+    creator: 'นพ.ธีรเดช หัวหน้าหน่วยเทคโนโลยีและสื่อการสอน',
+    tags: ['ภาพมุมสูง', 'ตึกOPD', 'ศูนย์การแพทย์', 'โดรนโรงพยาบาล'],
     createdAt: '2026-05-20T14:30:00.000Z',
     clicksCount: 98
   },
   {
     id: '3',
-    title: 'ลิงก์คลังแชร์ไดรฟ์รวมไฟล์โลโก้สถาบัน (.PNG / .SVG / .AI)',
+    title: 'ลิงก์คลังแชร์ไดรฟ์รวมไฟล์โลโก้โรงพยาบาลและภาพสัญลักษณ์กระทรวง (.PNG / .SVG / .AI)',
     type: 'link',
     url: 'https://drive.google.com',
     thumbnailUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80',
-    description: 'ลิงก์คลังไดร์ฟของตกแต่งกราฟิก โลโก้แบบโปร่งแสง ไม่มีพื้นหลัง มีให้เลือกดาวน์โหลดครบทุกสีตามมาตรฐานแบรนด์',
-    creator: 'ฝ่ายสารสนเทศและประชาสัมพันธ์',
-    tags: ['โลโก้', 'เทมเพลต', 'กราฟิก', 'GoogleDrive'],
+    description: 'ลิงก์แชร์ไดรฟ์รวบรวมไฟล์ตราสัญลักษณ์โรงพยาบาล สัญลักษณ์งานวิชาการ และภาพกราฟิกประกอบสื่อสุขศึกษา ไม่มีพื้นหลัง สำหรับบุคลากรนำไปใช้ทางการผลิตสื่อ',
+    creator: 'ฝ่ายโสตทัศนูปกรณ์และมัลติมีเดียส่วนกลาง',
+    tags: ['ตราโลโก้', 'CIโรงพยาบาล', 'กราฟิกสุขศึกษา', 'GoogleDrive'],
     createdAt: '2026-05-25T08:15:00.000Z',
     clicksCount: 215
   },
   {
     id: '4',
-    title: 'คู่มือบริการงานโสตทัศนูปกรณ์และการยืม-คืน อุปกรณ์ ปีการศึกษาล่าสุด',
+    title: 'คู่มือสุขอนามัยและระเบียบการจัดทำสื่อวิดีโอเคสผ่าตัดและการยืมอุปกรณ์โสตฯ ล่าสุด',
     type: 'document',
     url: 'https://example.com/manual-2026.pdf',
     thumbnailUrl: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=400&q=80',
-    description: 'ไฟล์เอกสาร PDF รวบรวมแนวทางการเขียนคำร้องยืมกล้อง ไมโครโฟน โปรเจกเตอร์ และเงื่อนไขการให้บริการของทีมงานโสตฯ ส่วนกลาง',
-    creator: 'หัวหน้าศูนย์เทคโนโลยีการศึกษา',
-    tags: ['คู่มือ', 'เอกสารยืมคืน', 'ระเบียบการ', 'PDF'],
+    description: 'ไฟล์เอกสาร PDF รวบรวมหลักเกณฑ์ความปลอดภัยของห้องบันทึกเสียงและขั้นตอนการเขียนคำร้องยืมกล้อง ไมโครโฟนไร้สาย สำหรับบันทึกขั้นตอนทางการแพทย์อย่างถูกต้อง',
+    creator: 'ฝ่ายวิทยบริการและศูนย์การเรียนรู้แพทยศาสตรศึกษา',
+    tags: ['คู่มือการยืม', 'ระเบียบห้องผ่าตัด', 'แนวทางทำสื่อ', 'PDF'],
     createdAt: '2026-05-28T11:00:00.000Z',
     clicksCount: 47
   }
@@ -192,7 +192,7 @@ export default function App() {
       url: newUrl.trim(),
       thumbnailUrl: finalThumbnail,
       description: newDescription.trim() || 'ไม่มีคำอธิบายเพิ่มเติมเกี่ยวกับชิ้นงานนี้',
-      creator: newCreator.trim() || 'ฝ่ายวิทยบริการฯ',
+      creator: newCreator.trim() || 'ศูนย์โสตทัศนศึกษาโรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช',
       tags: parseTags(newTagsString),
       createdAt: new Date().toISOString(),
       clicksCount: 0
@@ -245,7 +245,7 @@ export default function App() {
     const objectUrl = URL.createObjectURL(file);
     setNewUrl(objectUrl);
     setNewTitle(file.name.replace(/\.[^/.]+$/, "")); // Strip file extension
-    setNewCreator('อัปโหลดไฟล์ในระบบ');
+    setNewCreator('อัปโหลดไฟล์โดยเจ้าหน้าที่');
     setNewTagsString(file.type.split('/')[0] || 'ไฟล์ท้องถิ่น');
     
     // Auto preset thumbnails
@@ -308,7 +308,7 @@ export default function App() {
                 Media Archive
               </h1>
               <p className="text-[10px] sm:text-[11px] text-teal-400/80 font-bold tracking-wider uppercase">
-                คลังลิงก์สื่อและผลงานโสตศึกษา
+                คลังบริการสื่อศึกษาและผลงานโสตทัศนศึกษาโรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช
               </p>
             </div>
           </div>
@@ -358,10 +358,10 @@ export default function App() {
               ✨ เปิดทำงานสมบูรณ์ (เข้าสู่หน้าหลักโดยตรง)
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
-              ศูญน์จัดเก็บและกระจายข้อมูลผลงานโสตฯ ส่วนกลาง 🎒
+              ศูนย์บริการและคลังจัดเก็บผลงานโสตทัศนูปกรณ์โรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช 🏥
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              ไม่ต้องดำเนินการลงชื่อใช้ใดๆ เพิ่มเติม สามารถเข้าไปค้นหา ดาวน์โหลด และคัดลอกไฟล์ต้นฉบับคุณภาพสูง ภาพถ่ายโดรน วิดีโอสเก็ตช์งาน หรือคู่มือเอกสารระเบียบการจัดทำมีเดียร่วมกันได้ในคลิกเดียว
+              สืบค้น คัดลอก และดาวน์โหลดสื่อสุขศึกษาคุณภาพสูง วิดีโองานวิชาการทางการแพทย์ ภาพถ่ายโดรนตึกศูนย์การแพทย์ และคู่มือแนะนำอุปกรณ์โสตทัศนูปกรณ์ได้อย่างรวดเร็วในคลิกเดียว
             </p>
           </div>
 
@@ -483,10 +483,10 @@ export default function App() {
           <div className="bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl p-4 border border-slate-800/80">
             <h3 className="text-xs font-black text-slate-350 flex items-center gap-1.5 uppercase tracking-wider">
               <Info size={13} className="text-teal-400" />
-              ระเบียบการจัดหาชิ้นงาน
+              ระเบียบความปลอดภัยข้อมูล
             </h3>
             <p className="mt-2 text-[11px] text-slate-400 leading-normal">
-              ชิ้นงานและคู่มือที่เผยแพร่ถือเป็นลิขสิทธิ์ความดูแลของโรงเรียน สมาชิกฝ่ายโสตศึกษาและผู้นำเสนอสามารถดาวน์โหลดและคัดลอก ไปประกอบกิจกรรมการขับเคลื่อนสื่อการบันทึกภาพถ่ายโดยระมัดระวังความเหมาะสม
+              ชิ้นงานสื่อการสอนและคู่มือทั้งหมดที่เผยแพร่ ถือเป็นลิขสิทธิ์ความดูแลของโรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช บุคลากรทางการแพทย์ทุกฝ่ายงานสามารถดาวน์โหลดเพื่อจัดระเบียบและใช้ประกอบการทำงาน คัดลอกข้อมูลโดยเคารพต่อความเป็นส่วนตัวของผู้รับบริการ
             </p>
           </div>
 
@@ -508,7 +508,7 @@ export default function App() {
             </div>
 
             {allTags.length === 0 ? (
-              <p className="text-[11px] text-slate-500">ไม่มีป้ายกำกับในระบบวิทยบริการขณะนี้</p>
+              <p className="text-[11px] text-slate-500">ไม่มีป้ายกำกับในระบบโสตทัศนศึกษาขณะนี้</p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
                 {allTags.map(tag => {
@@ -727,10 +727,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left space-y-1">
             <p className="text-xs font-bold text-slate-400">
-              Media Archive (คลังบริการผลงานโสตศึกษาโรงเรียน) - ปีการศึกษา 2569
+              Media Archive (คลังบริการผลงานโสตทัศนศึกษาโรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช) - ปีงบประมาณ 2569
             </p>
             <p className="text-[11px] text-slate-500">
-              พัฒนาขึ้นเพื่ออำนวยความสะดวกในการจัดเก็บไฟล์ต้นฉบับภาพงานพิธีการ กิจกรรม และระเบียบส่วนงานอย่างเป็นทางการ
+              พัฒนาขึ้นเพื่ออำนวยความสะดวกในการจัดเก็บไฟล์ต้นฉบับบันทึกการซ้อมรหัสวิกฤต วารสารวิชาการแพทย์ ภาพนิ่งอาคาร และระเบียบส่วนงานอย่างเป็นทางการ
             </p>
           </div>
           <p className="text-[10px] text-slate-500">
@@ -812,7 +812,7 @@ export default function App() {
                 <input
                   type="text"
                   required
-                  placeholder="เช่น ประมวลภาพถ่ายงานเทศกาลกีฬาสี ปี 2568"
+                  placeholder="เช่น คู่มือระเบียบการผลิตสื่อสุขศึกษาและห้องสตูดิโอ"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 placeholder:text-slate-650 focus:outline-none focus:border-teal-400 text-slate-200"
@@ -839,7 +839,7 @@ export default function App() {
                   <label className="block text-xs font-black text-slate-300 mb-1.5">ชื่อผู้อัปโหลด / ฝ่ายงาน</label>
                   <input
                     type="text"
-                    placeholder="เช่น ทีมงานโสตฯ , ครูสายชล"
+                    placeholder="เช่น งานโสตทัศนศึกษาเพื่อแพทยศาสตรศึกษา"
                     value={newCreator}
                     onChange={(e) => setNewCreator(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 placeholder:text-slate-650 focus:outline-none focus:border-teal-400 text-slate-200"
@@ -889,7 +889,7 @@ export default function App() {
                 <label className="block text-xs font-black text-slate-300 mb-1.5">ป้ายกำกับสำหรับค้นหาแถบซ้าย (แฮชแท็ก คั่นด้วยเครื่องหมายจุลภาค ",")</label>
                 <input
                   type="text"
-                  placeholder="เช่น ภาพถ่ายเรียน, อาคารใหม่,โดรน (ไม่จำเป็นต้องใส่เครื่องหมาย #)"
+                  placeholder="เช่น อบรมแพทย์, ตึกOPD, คู่มือการใช้งาน, สื่อสุขศึกษา (ไม่จำเป็นต้องใส่เครื่องหมาย #)"
                   value={newTagsString}
                   onChange={(e) => setNewTagsString(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-medium text-slate-200 placeholder:text-slate-650 focus:outline-none focus:border-teal-400 text-slate-200"

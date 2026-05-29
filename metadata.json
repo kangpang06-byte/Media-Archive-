@@ -1,5 +1,5 @@
 {
-  "name": "Media Archive (คลังผลงานโสตฯ)",
+  "name": "Media Archive (คลังบริการผลงานโสตทัศนศึกษาโรงพยาบาลสมเด็จพระเจ้าตากสินมหาราช)",
   "description": "A centralized hub for media links, photos, and videos with tag-based search and self-service access.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
