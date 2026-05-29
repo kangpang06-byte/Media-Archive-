@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { useAuth } from '../AuthContext';
 import { X, Plus, Tag, Link as LinkIcon, Calendar, Folder, Type, AlignLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -25,7 +24,10 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      alert('กรุณาเข้าสู่ระบบก่อนทำรายการ');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -34,16 +36,20 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
         .map((tag) => tag.trim())
         .filter((tag) => tag !== '');
 
-      await addDoc(collection(db, 'media_items'), {
-        title: formData.title,
-        description: formData.description,
-        link: formData.link,
-        category: formData.category,
-        year: Number(formData.year),
-        tags: tagsArray,
-        createdAt: serverTimestamp(),
-        createdBy: user.uid,
+      // Execute atomic Supabase Remote Procedure Call (RPC)
+      // This automatically handles relational transactions for media_items, tags, and junction table
+      const { error } = await supabase.rpc('add_media_item_with_tags', {
+        p_title: formData.title,
+        p_description: formData.description || '',
+        p_link: formData.link,
+        p_year: Number(formData.year),
+        p_category: formData.category,
+        p_tags: tagsArray,
       });
+
+      if (error) {
+        throw error;
+      }
 
       setFormData({
         title: '',
@@ -54,9 +60,9 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
         tags: '',
       });
       onClose();
-    } catch (error) {
-      console.error('Error adding media item:', error);
-      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    } catch (error: any) {
+      console.error('Error adding media archive item to Supabase:', error);
+      alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + (error.message || 'กรุณาลองใหม่อีกครั้ง'));
     } finally {
       setLoading(false);
     }

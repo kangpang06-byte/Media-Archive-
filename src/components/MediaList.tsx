@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, orderBy, onSnapshot, where, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { ExternalLink, Calendar, Tag, Folder, Search, Filter, X, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -13,7 +12,7 @@ interface MediaItem {
   tags: string[];
   year: number;
   category: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 export const MediaList: React.FC = () => {
@@ -23,18 +22,75 @@ export const MediaList: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
-  useEffect(() => {
-    const q = query(collection(db, 'media_items'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newItems = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as MediaItem[];
-      setItems(newItems);
-      setLoading(false);
-    });
+  const fetchItems = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('media_items')
+        .select(`
+          id,
+          title,
+          description,
+          link,
+          year,
+          category,
+          created_at,
+          media_item_tags (
+            tags (
+              name
+            )
+          )
+        `)
+        .order('created_at', { ascending: false });
 
-    return () => unsubscribe();
+      if (error) {
+        throw error;
+      }
+
+      const formatted = (data || []).map((item: any) => {
+        const tagsList = item.media_item_tags
+          ? item.media_item_tags
+              .map((mit: any) => mit.tags?.name)
+              .filter(Boolean)
+          : [];
+
+        return {
+          id: String(item.id),
+          title: item.title,
+          description: item.description || '',
+          link: item.link,
+          year: Number(item.year),
+          category: item.category,
+          createdAt: item.created_at,
+          tags: tagsList,
+        };
+      });
+
+      setItems(formatted);
+    } catch (err) {
+      console.error('Error loading media archives from Supabase:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+
+    // Listen to real-time additions/modifications
+    const channel = supabase
+      .channel('realtime_media_items')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'media_items' },
+        () => {
+          fetchItems();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const filteredItems = items.filter((item) => {
