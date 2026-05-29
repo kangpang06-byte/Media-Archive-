@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../supabase';
-import { ExternalLink, Calendar, Tag, Folder, Search, Filter, X, Download } from 'lucide-react';
+import { ExternalLink, Calendar, Tag, Folder, Search, Filter, X, Download, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
@@ -13,7 +13,31 @@ interface MediaItem {
   year: number;
   category: string;
   createdAt: string;
+  storage_vault?: string;
 }
+
+const resolveStorageVault = (link: string, vaultFromDb?: string) => {
+  if (vaultFromDb && vaultFromDb.trim() !== '') {
+    return vaultFromDb;
+  }
+  const url = link.toLowerCase();
+  if (url.includes('drive.google.com') || url.includes('google.com/drive')) {
+    return 'Google Drive (คลังหลักโสตฯ)';
+  }
+  if (url.includes('onedrive') || url.includes('sharepoint.com')) {
+    return 'OneDrive (คลังสถาบัน)';
+  }
+  if (url.includes('dropbox.com')) {
+    return 'Dropbox Archive';
+  }
+  if (url.includes('flickr.com')) {
+    return 'Flickr (คลังภาพความละเอียดสูง)';
+  }
+  if (url.includes('icloud.com')) {
+    return 'iCloud Drive';
+  }
+  return 'คลังเซิร์ฟเวอร์ภายนอก (External Cloud)';
+};
 
 export const MediaList: React.FC = () => {
   const [items, setItems] = useState<MediaItem[]>([]);
@@ -24,7 +48,11 @@ export const MediaList: React.FC = () => {
 
   const fetchItems = async () => {
     try {
-      const { data, error } = await supabase
+      let data: any[] | null = null;
+      let error: any = null;
+
+      // 1. Try to fetch with storage_vault column explicitly
+      const res = await supabase
         .from('media_items')
         .select(`
           id,
@@ -33,6 +61,7 @@ export const MediaList: React.FC = () => {
           link,
           year,
           category,
+          storage_vault,
           created_at,
           media_item_tags (
             tags (
@@ -41,6 +70,35 @@ export const MediaList: React.FC = () => {
           )
         `)
         .order('created_at', { ascending: false });
+
+      data = res.data;
+      error = res.error;
+
+      // 2. If it fails due to a missing column (e.g. schema not yet migrated), fallback to query without storage_vault
+      if (error && (error.message?.includes('storage_vault') || error.hint?.includes('column') || error.code === 'PGRST200')) {
+        console.warn('storage_vault column not yet added to database. Falling back to dynamic URL resolution...');
+        const backupRes = await supabase
+          .from('media_items')
+          .select(`
+            id,
+            title,
+            description,
+            link,
+            year,
+            category,
+            created_at,
+            media_item_tags (
+              tags (
+                name
+              )
+            )
+          `)
+          .order('created_at', { ascending: false });
+        
+        data = backupRes.data;
+        error = backupRes.error;
+      }
+
 
       if (error) {
         throw error;
@@ -62,6 +120,7 @@ export const MediaList: React.FC = () => {
           category: item.category,
           createdAt: item.created_at,
           tags: tagsList,
+          storage_vault: item.storage_vault || '',
         };
       });
 
@@ -97,7 +156,9 @@ export const MediaList: React.FC = () => {
     const matchesSearch = 
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.description?.toLowerCase().includes(search.toLowerCase()) ||
-      item.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()));
+      item.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())) ||
+      (item.storage_vault && item.storage_vault.toLowerCase().includes(search.toLowerCase())) ||
+      resolveStorageVault(item.link, item.storage_vault).toLowerCase().includes(search.toLowerCase());
     
     const matchesCategory = !selectedCategory || item.category === selectedCategory;
     const matchesYear = !selectedYear || item.year === selectedYear;
@@ -124,7 +185,7 @@ export const MediaList: React.FC = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-primary-dark" size={18} />
           <input
             type="text"
-            placeholder="ค้นหาชื่องาน, แท็ก, หรือคำอธิบาย..."
+            placeholder="ค้นหาชื่องาน, แท็ก, คลังเก็บข้อมูล..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-2xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none ring-primary transition-all focus:ring-2"
@@ -204,6 +265,14 @@ export const MediaList: React.FC = () => {
                 <h3 className="mb-2 text-lg font-semibold text-gray-900 group-hover:text-primary-dark">
                   {item.title}
                 </h3>
+
+                {/* Storage Vault Information */}
+                <div className="mb-3 flex flex-wrap items-center gap-1">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-100">
+                    <Database size={11} className="text-emerald-600" />
+                    <span>{resolveStorageVault(item.link, item.storage_vault)}</span>
+                  </span>
+                </div>
                 
                 <p className="mb-6 flex-1 text-sm leading-relaxed text-gray-500 line-clamp-2">
                   {item.description || 'ไม่มีคำอธิบาย'}

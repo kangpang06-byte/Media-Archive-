@@ -4,6 +4,14 @@
 -- Designed for: Supabase PostgreSQL with Row-Level Security (RLS)
 -- ==========================================
 
+-- MIGRATION NOTICE:
+-- หากคุณมีตารางอยู่แล้วและต้องการเพิ่มคลังเก็บข้อมูล กรุณารัน SQL ด้านล่างนี้ใน SQL Editor ของ Supabase:
+--
+-- ALTER TABLE public.media_items ADD COLUMN IF NOT EXISTS storage_vault TEXT DEFAULT 'Google Drive (ทีมโสตฯ)';
+-- 
+-- และทำการรันคำสั่งสร้างฟังก์ชัน `add_media_item_with_tags` รูปแบบใหม่ที่อยู่ด้านล่างสุดของไฟล์นี้เพื่ออัปเดตระบบ
+
+
 -- 1. Create DB Enumerations and Types if needed
 -- (We use standard text-based columns with constraints for maximum flexibility)
 
@@ -25,6 +33,7 @@ CREATE TABLE public.media_items (
     link TEXT NOT NULL CHECK (link ~* '^https?://.*'),
     year INTEGER NOT NULL CHECK (year > 1900 AND year < 2100),
     category TEXT NOT NULL CHECK (category IN ('Photo', 'Video', 'Design', 'Event', 'Other')),
+    storage_vault TEXT NOT NULL DEFAULT 'Google Drive (ทีมโสตฯ)' CHECK (char_length(storage_vault) <= 100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL
 );
@@ -186,7 +195,8 @@ CREATE OR REPLACE FUNCTION public.add_media_item_with_tags(
     p_link TEXT,
     p_year INTEGER,
     p_category TEXT,
-    p_tags TEXT[]
+    p_tags TEXT[],
+    p_storage_vault TEXT DEFAULT 'Google Drive (ทีมโสตฯ)'
 ) RETURNS VOID AS $$
 DECLARE
     v_media_id BIGINT;
@@ -199,8 +209,8 @@ BEGIN
     END IF;
 
     -- Insert new media item
-    INSERT INTO public.media_items (title, description, link, year, category, created_by)
-    VALUES (p_title, p_description, p_link, p_year, p_category, auth.uid())
+    INSERT INTO public.media_items (title, description, link, year, category, storage_vault, created_by)
+    VALUES (p_title, p_description, p_link, p_year, p_category, p_storage_vault, auth.uid())
     RETURNING id INTO v_media_id;
 
     -- Insert tags & tag junctions loop
@@ -222,3 +232,4 @@ BEGIN
     END LOOP;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+

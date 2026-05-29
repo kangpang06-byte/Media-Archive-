@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabase';
 import { useAuth } from '../AuthContext';
-import { X, Plus, Tag, Link as LinkIcon, Calendar, Folder, Type, AlignLeft } from 'lucide-react';
+import { X, Plus, Tag, Link as LinkIcon, Calendar, Folder, Type, AlignLeft, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
@@ -13,6 +13,7 @@ interface AddMediaModalProps {
 export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [isCustomVault, setIsCustomVault] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -20,7 +21,24 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
     category: 'Photo',
     year: new Date().getFullYear(),
     tags: '',
+    storageVault: 'Google Drive (คลังหลักโสตฯ)',
   });
+
+  const autoDetectVault = (url: string) => {
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes('drive.google.com') || lowerUrl.includes('google.com/drive')) {
+      return 'Google Drive (คลังหลักโสตฯ)';
+    } else if (lowerUrl.includes('onedrive') || lowerUrl.includes('sharepoint.com')) {
+      return 'OneDrive (คลังสถาบัน)';
+    } else if (lowerUrl.includes('dropbox.com')) {
+      return 'Dropbox Archive';
+    } else if (lowerUrl.includes('flickr.com')) {
+      return 'Flickr (คลังภาพความละเอียดสูง)';
+    } else if (lowerUrl.includes('icloud.com')) {
+      return 'iCloud Drive';
+    }
+    return 'คลังเซิร์ฟเวอร์ภายนอก (External Cloud)';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,14 +56,30 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
 
       // Execute atomic Supabase Remote Procedure Call (RPC)
       // This automatically handles relational transactions for media_items, tags, and junction table
-      const { error } = await supabase.rpc('add_media_item_with_tags', {
+      // It includes resilient fallback to support old database schema signatures without throwing errors
+      let { error } = await supabase.rpc('add_media_item_with_tags', {
         p_title: formData.title,
         p_description: formData.description || '',
         p_link: formData.link,
         p_year: Number(formData.year),
         p_category: formData.category,
         p_tags: tagsArray,
+        p_storage_vault: formData.storageVault || 'Google Drive (ทีมโสตฯ)',
       });
+
+      // Fail-safe fallback if column/parameter storage_vault doesn't exist yet on user's live Supabase instance
+      if (error && (error.message?.includes('p_storage_vault') || error.message?.includes('storage_vault') || error.message?.includes('does not exist'))) {
+        console.warn('Database schema does not support storage_vault yet. Falling back to old RPC parameter signature...', error.message);
+        const fallbackRes = await supabase.rpc('add_media_item_with_tags', {
+          p_title: formData.title,
+          p_description: formData.description || '',
+          p_link: formData.link,
+          p_year: Number(formData.year),
+          p_category: formData.category,
+          p_tags: tagsArray,
+        });
+        error = fallbackRes.error;
+      }
 
       if (error) {
         throw error;
@@ -58,7 +92,9 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
         category: 'Photo',
         year: new Date().getFullYear(),
         tags: '',
+        storageVault: 'Google Drive (คลังหลักโสตฯ)',
       });
+      setIsCustomVault(false);
       onClose();
     } catch (error: any) {
       console.error('Error adding media archive item to Supabase:', error);
@@ -159,10 +195,59 @@ export const AddMediaModal: React.FC<AddMediaModalProps> = ({ isOpen, onClose })
                     required
                     type="url"
                     value={formData.link}
-                    onChange={(e) => setFormData({ ...formData, link: e.target.value })}
+                    onChange={(e) => {
+                      const linkValue = e.target.value;
+                      const detectedVault = autoDetectVault(linkValue);
+                      setFormData({ 
+                        ...formData, 
+                        link: linkValue, 
+                        storageVault: isCustomVault ? formData.storageVault : detectedVault 
+                      });
+                    }}
                     placeholder="https://drive.google.com/..."
                     className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none ring-primary transition-all focus:bg-white focus:ring-2"
                   />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <Database size={12} />
+                    คลังเก็บข้อมูลตำแหน่งปลายทาง
+                  </label>
+                  <select
+                    value={isCustomVault ? 'custom' : formData.storageVault}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === 'custom') {
+                        setIsCustomVault(true);
+                        setFormData({ ...formData, storageVault: '' });
+                      } else {
+                        setIsCustomVault(false);
+                        setFormData({ ...formData, storageVault: val });
+                      }
+                    }}
+                    className="w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none ring-primary transition-all focus:bg-white focus:ring-2"
+                  >
+                    <option value="Google Drive (คลังหลักโสตฯ)">Google Drive (คลังหลักโสตฯ)</option>
+                    <option value="Google Drive (ทีมโสตฯ)">Google Drive (ทีมโสตฯ)</option>
+                    <option value="OneDrive (คลังสถาบัน)">OneDrive (คลังสถาบัน)</option>
+                    <option value="Dropbox Archive">Dropbox Archive</option>
+                    <option value="Flickr (คลังภาพความละเอียดสูง)">Flickr (คลังภาพความละเอียดสูง)</option>
+                    <option value="iCloud Drive">iCloud Drive</option>
+                    <option value="เซิร์ฟเวอร์สำรอง NAS">เซิร์ฟเวอร์สำรอง NAS</option>
+                    <option value="custom">✏️ อื่นๆ/ระบุคลังเก็บข้อมูลเอง...</option>
+                  </select>
+
+                  {isCustomVault && (
+                    <input
+                      type="text"
+                      required
+                      value={formData.storageVault}
+                      onChange={(e) => setFormData({ ...formData, storageVault: e.target.value })}
+                      placeholder="เช่น NAS ทีมโสตฯ หรือ Drive สถาบันอันใหม่"
+                      className="mt-2 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none ring-primary transition-all focus:bg-white focus:ring-2"
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
